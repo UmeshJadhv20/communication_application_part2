@@ -52,16 +52,11 @@ const Register = () => {
         e.preventDefault();
 
         if (validateForm()) {
-            // Store the data in localStorage
             let users = JSON.parse(localStorage.getItem('users')) || [];
             const userExists = users.some(user => user.email === formData.email);
             if (userExists) {
                 setErrors({...errors, email: 'Email already exists'});
             }else{
-
-                // Store the new user data in localStorage
-                // formData.id = new Date().getTime();
-
                 let { name, email, password } = formData;
                 let user = {
                     id: Number(new Date()),
@@ -69,12 +64,9 @@ const Register = () => {
                     email: email,
                     password: password
                 }
-               
-
                 users.push(user);               
                 localStorage.setItem('users', JSON.stringify(users));
 
-                // Reset form
                 setFormData({
                     name: '',
                     email: '',
@@ -83,12 +75,9 @@ const Register = () => {
                 });
                 setErrors({});
 
-                // Redirect to registration success page
                 navigate('/registration-success');
-
+                
             }
-           
-            
         }
     };
 
@@ -121,24 +110,12 @@ const Register = () => {
                 </div>
                 <div className="mb-3">
                     <label htmlFor="password" className="form-label">Password</label>
-                    <input 
-                        type="password" 
-                        className="form-control" 
-                        id="password" 
-                        value={formData.password}
-                        onChange={handleInputChange}
-                    />
+                    <input type="password" className="form-control"  id="password" value={formData.password} onChange={handleInputChange} />
                     {errors.password && <div className="text-danger">{errors.password}</div>}
                 </div>
                 <div className="mb-3">
                     <label htmlFor="confirm_password" className="form-label">Confirm Password</label>
-                    <input 
-                        type="password" 
-                        className="form-control" 
-                        id="confirm_password" 
-                        value={formData.confirm_password}
-                        onChange={handleInputChange}
-                    />
+                    <input  type="password" className="form-control"  id="confirm_password"  value={formData.confirm_password}   onChange={handleInputChange}  />
                     {errors.confirm_password && <div className="text-danger">{errors.confirm_password}</div>}
                 </div>
                 <button type="submit" className="btn btn-primary">Register</button>
