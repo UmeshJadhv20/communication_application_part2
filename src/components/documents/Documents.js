@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Modal, Button, Table } from 'react-bootstrap';
+import { Modal, Button, Table, Alert } from 'react-bootstrap';
 import Nav from '../Nav';
 
-const MyDocuments = () => {
+const Documents = () => {
     const [documents, setDocuments] = useState([]);
     const [fileDescription, setFileDescription] = useState('');
     const [fileInput, setFileInput] = useState(null);
@@ -12,16 +12,18 @@ const MyDocuments = () => {
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showError, setShowError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         const storedDocuments = JSON.parse(localStorage.getItem('documents')) || [];
         setDocuments(storedDocuments);
     }, []);
    
-
     const handleUpload = () => {
         if (fileDescription.trim() === '' || !fileInput) {
-            alert('Please fill in the file description and select a file');
+            setErrorMessage('Please fill in the file description and select a file.');
+            setShowError(true);
             return;
         }
 
@@ -37,6 +39,7 @@ const MyDocuments = () => {
         setShowUploadModal(false);
         setFileDescription('');
         setFileInput(null);
+        setShowError(false);
     };
 
     const handleDelete = () => {
@@ -47,12 +50,19 @@ const MyDocuments = () => {
     };
 
     const handleEditSave = () => {
+        if (editFileDescription.trim() === '') {
+            setErrorMessage('File description cannot be empty.');
+            setShowError(true);
+            return;
+        }
+
         const updatedDocuments = documents.map(upload => 
             upload.id === currentFileId ? { ...upload, fileDescription: editFileDescription } : upload
         );
         localStorage.setItem('documents', JSON.stringify(updatedDocuments));
         setDocuments(updatedDocuments);
         setShowEditModal(false);
+        setShowError(false);
     };
 
     return (
@@ -60,6 +70,7 @@ const MyDocuments = () => {
         <Nav />
         <div className="container">
             <h1 className="text-center mt-3 mb-3">My Documents</h1>
+
             <Table striped hover id="documentListTable">
                 <thead>
                     <tr>
@@ -90,13 +101,12 @@ const MyDocuments = () => {
                 + Add Upload
             </Button>
 
-           
             <Modal show={showUploadModal} onHide={() => setShowUploadModal(false)} backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>Upload</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <form>
+                    <form className='mb-3'>
                         <div className="form-group">
                             <label htmlFor="fileDescription">File Description</label>
                             <input 
@@ -113,6 +123,11 @@ const MyDocuments = () => {
                             <input  type="file"  className="form-control-file"  id="fileInput"  onChange={(e) => setFileInput(e.target.files[0])}  />
                         </div>
                     </form>
+                    {showError && (
+                        <Alert variant="danger" onClose={() => setShowError(false)} dismissible>
+                            {errorMessage}
+                        </Alert>
+                    )}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="primary" onClick={handleUpload}>Upload Now</Button>
@@ -120,18 +135,29 @@ const MyDocuments = () => {
                 </Modal.Footer>
             </Modal>
 
-            
             <Modal show={showEditModal} onHide={() => setShowEditModal(false)} backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>Edit</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <form>
+                    <form className='mb-3'>
                         <div className="form-group">
                             <label htmlFor="edit_document_filedescription">File Description</label>
-                            <input  type="text"  className="form-control"  id="edit_document_filedescription"    value={editFileDescription}  onChange={(e) => setEditFileDescription(e.target.value)}  placeholder="File Description"  />
+                            <input 
+                                type="text" 
+                                className="form-control" 
+                                id="edit_document_filedescription" 
+                                value={editFileDescription}
+                                onChange={(e) => setEditFileDescription(e.target.value)}
+                                placeholder="File Description" 
+                            />
                         </div>
                     </form>
+                    {showError && (
+                        <Alert variant="danger" onClose={() => setShowError(false)} dismissible>
+                            {errorMessage}
+                        </Alert>
+                    )}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="primary" onClick={handleEditSave}>Save</Button>
@@ -139,7 +165,6 @@ const MyDocuments = () => {
                 </Modal.Footer>
             </Modal>
 
-           
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>Delete File</Modal.Title>
@@ -157,4 +182,4 @@ const MyDocuments = () => {
     );
 };
 
-export default MyDocuments;
+export default Documents;
