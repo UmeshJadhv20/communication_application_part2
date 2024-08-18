@@ -22,7 +22,7 @@ function App() {
                 <Route path="/registration-success" element={<RegistrationSuccess />} />
                 <Route path="/login-success" element={<PrivateRoute element={LoginSuccess} />} />
                 <Route path="/users" element={<PrivateRoute element={UserList} />} />
-                <Route path="/users/edit-user/:id" element={<EditUser />} />
+                <Route path="/users/edit-user/:id" element={<PrivateRoute element={EditUser} />} />
                 <Route path="/documents" element={<PrivateRoute element={Documents} />} />
                 <Route path="/chats" element={<PrivateRoute element={Chats} />} />
             </Routes>
